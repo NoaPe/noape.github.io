@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Timeline</title>
+    <style>
+        body {
+            display: flex;
+            background: #151e69;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+
+        .year {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .year-number {
+            width: 50px;
+            height: 120px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .year-line {
+            width: 90%;
+            height: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+        }
+
+        .year-element {
+            height: 100%;
+        }
+
+        .year-element-organisation {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            top: -50px;
+            width: 1000px;
+        }
+
+        .year-element-ship {
+            font-size: 12px;
+            color: white;
+            position: relative;
+            top: -50px;
+            width: 1000px;
+        }
+
+        .year-element-days {
+            font-size: 12px;
+            color: white;
+            position: relative;
+            top: -50px;
+            width: 1000px;
+        }
+
+        .today {
+            width: 2px;
+            height: 30px;
+            background: red;
+            position: relative;
+            top: -5px;
+            z-index: 1;
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    </div>
+
+    <script>
+        const boardings = [
+            {
+                type: "formation",
+                organisation: "IME",
+                ship: "Certificat Matelot Pont",
+                color: "grey",
+                in: "2023-10-02",
+                out: "2023-12-17",
+            },
+            {
+                type: "formation",
+                organisation: "Corsica Linea",
+                ship: "Navpax",
+                color: "grey",
+                in: "2024-01-03",
+                out: "2024-01-05",
+            },
+            {
+                type: "formation",
+                organisation: "Corsica Linea",
+                ship: "CAEERS",
+                color: "grey",
+                in: "2024-01-15",
+                out: "2024-01-18",
+            },
+            {
+                type: "boarding",
+                organisation: "Wings Of The Ocean",
+                ship: "Kraken",
+                color: "#2149db",
+                logo: "wings.jpg",
+                in: "2024-01-18",
+                out: "2024-03-08",
+            },
+            {
+                type: "boarding",
+                organisation: "Unu Mondo",
+                ship: "Northabout",
+                color: "#9be89b",
+                logo: "unumondo.jpg",
+                in: "2024-03-08",
+                out: "2024-04-14",
+            },
+            {
+                type: "boarding",
+                organisation: "Wings Of The Ocean",
+                ship: "Scylla",
+                color: "#2149db",
+                logo: "wings.jpg",
+                in: "2024-04-14",
+                out: "2024-04-26",
+            },
+            {
+                type: "boarding",
+                organisation: "MV Louise Michel",
+                ship: "Louise Michel",
+                color: "#fc0fc0",
+                in: "2024-05-06",
+                out: "2024-06-06",
+            },
+            {
+                type: "boarding",
+                organisation: "Wings Of The Ocean",
+                ship: "Kraken",
+                color: "#2149db",
+                logo: "wings.jpg",
+                in: "2024-06-7",
+                out: "2024-06-29",
+            },
+            {
+                type: "boarding",
+                organisation: "Estrella Lab",
+                ship: "Estrella Lab",
+                color: "#000",
+                logo: "wings.jpg",
+                in: "2024-08-04",
+                out: "2024-08-16",
+            },
+            {
+                type: "boarding",
+                organisation: "MV Louise Michel",
+                ship: "Louise Michel",
+                position: "SIB driver",
+                color: "#fc0fc0",
+                in: "2024-11-16",
+                out: "2024-12-21",
+            },
+            {
+                type: "boarding",
+                organisation: "Sea-Eye",
+                ship: "Sea-Eye 4",
+                position: "Deck Rating",
+                color: "#ed6d62",
+                in: "2025-01-02",
+                out: "2025-02-07",
+            },
+        ]
+        
+        const container = document.querySelector(".container");
+        const maxYear = Math.max(...boardings.map(boarding => boarding.in.split("-")[0]), ...boardings.map(boarding => boarding.out.split("-")[0]));
+
+        // Loop for each year
+
+        for (let year = 2023; year <= maxYear; year++) {
+            const element = document.createElement("div");
+            element.classList.add("year");
+            element.dataset.year = year;
+            element.innerHTML = `
+                <div class="year-number">${year}</div>
+                <div class="year-line"></div>
+            `;
+            container.appendChild(element);
+
+
+            // If today is in this year, add a line
+
+            if (year == new Date().getFullYear()) {
+                const element = document.createElement("div");
+                element.classList.add("today");
+                element.style.left = `${Math.round((new Date() - new Date(`${year}-01-01`)) / 86400000 / 365 * 100)}%`;
+                container.querySelector(`[data-year="${year}"] .year-line`).appendChild(element);
+            }
+
+            // Loop for each boarding
+
+            let lastBoarding = {
+                in: `${year}-01-01`,
+                out: `${year}-01-01`
+            }
+
+            let count = 0;
+
+            boardings.forEach(boarding => {
+
+                if (boarding.in.split("-")[0] == year) {
+                    
+                    count++;
+
+                    if (lastBoarding.out !== boarding.in) {
+                        const element = document.createElement("div");
+                        element.classList.add("year-element");
+                        element.style.backgroundColor = "#FFF";
+                        element.style.width = `${Math.round((new Date(boarding.in) - new Date(lastBoarding.out)) / 86400000 / 365 * 100)}%`;
+                        container.querySelector(`[data-year="${year}"] .year-line`).appendChild(element);
+                    }
+
+                    lastBoarding = boarding;
+
+                    const element = document.createElement("div");
+
+                    // If the boarding is after today, opacity 50%
+                    if (new Date(boarding.in) > new Date()) {
+                        element.style.opacity = 0.5;
+                    }
+
+                    element.classList.add("year-element");
+                    element.style.backgroundColor = boarding.color;
+                    element.style.width = `${Math.round((new Date(boarding.out) - new Date(boarding.in)) / 86400000 / 365 * 100)}%`;
+                    element.innerHTML = `
+                        <div class="year-element-organisation">${boarding.organisation}</div>
+                        <div class="year-element-ship">${boarding.ship}</div>
+                        <div class="year-element-days">${Math.round((new Date(boarding.out) - new Date(boarding.in)) / 86400000)} jours</div>
+                    `;
+
+                    if (count % 2 == 0) {
+                        element.querySelector(".year-element-organisation").style.top = "-100px";
+                        element.querySelector(".year-element-ship").style.top = "-100px";
+                        element.querySelector(".year-element-days").style.top = "-100px";
+                    }
+
+                    container.querySelector(`[data-year="${year}"] .year-line`).appendChild(element);
+                
+                } else if (boarding.out.split("-")[0] == year) {
+                    
+                    const element = document.createElement("div");
+                    
+                    // If the boarding is after today, opacity 50%
+                    if (new Date(boarding.in) > new Date()) {
+                        element.style.opacity = 0.5;
+                    }
+
+                    element.classList.add("year-element");
+                    element.style.backgroundColor = boarding.color;
+                    element.style.width = `${Math.round((new Date(boarding.out) - new Date(boarding.in)) / 86400000 / 365 * 100)}%`;
+                    container.querySelector(`[data-year="${year}"] .year-line`).appendChild(element);
+                
+                }
+            });
+        }
+
+        /*
+        
+        boardings.forEach(boarding => {
+            const year = container.querySelector(`[data-year="${boarding.in.split("-")[0]}"]`);
+            const element = document.createElement("div");
+            element.classList.add("year-element");
+            element.style.backgroundColor = boarding.color;
+            element.style.width = `${Math.round((new Date(boarding.out) - new Date(boarding.in)) / 86400000 / 365 * 100)}%`;
+            element.innerHTML = `
+                <div class="year-element-organisation">${boarding.organisation}</div>
+                <div class="year-element-ship">${boarding.ship}</div>
+                <div class="year-element-days">${Math.round((new Date(boarding.out) - new Date(boarding.in)) / 86400000)} jours</div>
+            `;
+            year.querySelector(".year-line").appendChild(element);
+        });
+        */
+    </script>
+</body>
+</html>
